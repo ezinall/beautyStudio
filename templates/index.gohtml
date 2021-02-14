@@ -1,0 +1,248 @@
+{{template "layout" .}}
+
+{{define "title"}}Home{{end}}
+
+{{define "content"}}
+        <div class="card border-0 mt-5">
+            <div class="row ">
+                <div class="col-md-3 d-flex justify-content-center">
+                    <img src="/static/img/brand.png" width="70%" height="90%" alt="...">
+                </div>
+                <div class="col-md-9">
+                    <div class="card-body">
+                        <h2 class="card-title mt-3">Добро пожаловать в <span class="text-primary">Beauty Studio Liloo!</span></h2>
+                        <p class="general-text mb-2">Превыше всего здесь ценится красота и естественность!</p>
+                        <p class="general-text mb-2">Главными приоритетами в работе для нас являются качество и безопасность! Индивидуальный подход и внимательное отношение к каждому клиенту позволяют достигать лучших результатов в нашей работе!</p>
+                        <p class="general-text mb-0">Каждый день мы работаем над тем, чтобы сделать Вас еще более прекрасными!<br>Будем рады видеть Вас в нашей студии!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Three columns of text below the carousel -->
+        {{/*        <div class="row">*/}}
+        {{/*            <div class="col-lg-4">*/}}
+        {{/*                <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text></svg>*/}}
+
+        {{/*                <h2>Heading</h2>*/}}
+        {{/*                <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>*/}}
+        {{/*                <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>*/}}
+        {{/*            </div><!-- /.col-lg-4 -->*/}}
+        {{/*            <div class="col-lg-4">*/}}
+        {{/*                <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text></svg>*/}}
+
+        {{/*                <h2>Heading</h2>*/}}
+        {{/*                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>*/}}
+        {{/*                <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>*/}}
+        {{/*            </div><!-- /.col-lg-4 -->*/}}
+        {{/*            <div class="col-lg-4">*/}}
+        {{/*                <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text></svg>*/}}
+
+        {{/*                <h2>Heading</h2>*/}}
+        {{/*                <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>*/}}
+        {{/*                <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>*/}}
+        {{/*            </div><!-- /.col-lg-4 -->*/}}
+        {{/*        </div><!-- /.row -->*/}}
+
+        <!-- START THE FEATURETTES -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Записаться на услугу</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/" method="POST" id="feedbackForm" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="inputName" class="form-label">Имя*</label>
+                                <input type="text" name="name" class="form-control" id="inputName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="inputPhone" class="form-label">Телефон*</label>
+                                <input type="tel" name="phone" class="form-control" id="inputPhone" pattern="\+7\([0-9]{3}\)[0-9]{3}\-[0-9]{2}\-[0-9]{2}" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="inputEmail" class="form-label">E-mail</label>
+                                <input type="email" name="email" class="form-control" id="inputEmail">
+                            </div>
+                            <input type="hidden" name="service" id="inputService" hidden>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <input type="submit" form="feedbackForm" class="btn btn-primary">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="featurette-divider" id="service01">
+
+        <div class="pricing-header px-3 py-3 pt-md-0 pb-md-4 mx-auto text-center">
+            <h1 class="text-muted">Услуги</h1>
+        </div>
+
+        <div class="row featurette">
+            <div class="col-md-7">
+                <h2 class="featurette-heading title-text text-purple">Перманентный макияж <span class="text-primary">бровей</span></h2>
+                <ul class="list-unstyled">
+                    <li class="general-text"><span class="text-primary">&#10004;</span> пудровое напыление</li>
+                    <li class="general-text"><span class="text-primary">&#10004;</span> теневая растушевка</li>
+                </ul>
+                <p class="general-text mb-2">Перманентный макияж бровей - это процедура коррекции формы и цвета бровей, предполагающая введение под кожу специального пигмента. Такой макияж отлично заменяет периодическое окрашивание или ежедневную прорисовку бровей.
+                <p class="general-text mb-2">Для нанесения применяется специальное оборудование и пигменты, благодаря которым получается отличный результат.</p>
+                <p class="general-text mb-0">Как правило, перманентный макияж бровей держится от 1-2 лет, в некоторых случаях - до 3-5 лет.
+                </p>
+
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#feedbackModal" data-bs-whatever="PM-BROWS">
+                    Записаться на услугу
+                </button>
+            </div>
+            <div class="col-md-5">
+{{/*                <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" fill="#aaa" dy=".3em">500x500</text></svg>*/}}
+                <img src="/static/img/service-brows.jpg" width="100%" height="100%" alt="...">
+            </div>
+        </div>
+
+        <hr class="featurette-divider" id="service02">
+
+        <div class="row featurette">
+            <div class="col-md-7 order-md-2">
+                <h2 class="featurette-heading title-text text-purple">Перманентный макияж <span class="text-primary">губ</span></h2>
+                <ul class="list-unstyled">
+                    <li class="general-text"><span class="text-primary">&#10004;</span> акварельные губы</li>
+                    <li class="general-text"><span class="text-primary">&#10004;</span> помадный эффект</li>
+                    <li class="general-text"><span class="text-primary">&#10004;</span> контур с растушевкой</li>
+                </ul>
+                <p class="general-text mb-2">Перманентный макияж губ обладает массой преимуществ. Он создает видимость объема, корректирует форму и мелкую асимметрию, делает цвет более глубоким и насыщенным, а контур – четким. </p>
+                <p class="general-text mb-2">Маскируются шрамы и разные дефекты, вплоть до заячьей губы. С возрастом это лучший способ восстановить молодость и свежесть губ.</p>
+                <p class="general-text mb-0">Держится до 1,5 лет, более сложные техники – до 2-2,5. При постоянном увлажнении
+                    и профессиональном исполнении оттенок сохраняется до 3-5 лет.</p>
+
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#feedbackModal" data-bs-whatever="PM-LIPS">
+                    Записаться на услугу
+                </button>
+            </div>
+            <div class="col-md-5 order-md-1">
+{{/*                <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" fill="#aaa" dy=".3em">500x500</text></svg>*/}}
+                <img src="/static/img/service-lips.jpg" width="100%" height="100%" alt="...">
+            </div>
+        </div>
+
+        <hr class="featurette-divider" id="service03">
+
+        <div class="row featurette">
+            <div class="col-md-7">
+                <h2 class="featurette-heading title-text text-purple">Перманентный макияж <span class="text-primary">глаз</span></h2>
+                <ul class="list-unstyled">
+                    <li class="general-text"><span class="text-primary">&#10004;</span> межресничный контур</li>
+                    <li class="general-text"><span class="text-primary">&#10004;</span> стрелка классическая</li>
+                    <li class="general-text"><span class="text-primary">&#10004;</span> стрелка с растушевкой</li>
+                </ul>
+                <p class="general-text mb-2">Перманентный макияж кожи век - самый простой и эффективный способ всегда быть красивой. </p>
+                <p class="general-text mb-2">Такой мейкап помогает сэкономить время при нанесении косметики по утрам или перед важным событием. При этом он подходит для девушек и женщин всех возрастов. </p>
+                <p class="general-text mb-0">С помощью перманентного макияжа можно откорректировать внешность, визуально увеличить глаза, сузить их или расширить, спрятать недостатки и многое другое.</p>
+
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#feedbackModal" data-bs-whatever="PM-EYES">
+                    Записаться на услугу
+                </button>
+            </div>
+            <div class="col-md-5">
+{{/*                <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" fill="#aaa" dy=".3em">500x500</text></svg>*/}}
+                <img src="/static/img/service-eyes.jpg" width="100%" height="100%" alt="...">
+            </div>
+        </div>
+
+        <hr class="featurette-divider" id="service04">
+
+        <div class="row featurette">
+            <div class="col-md-7 order-md-2">
+                <h2 class="featurette-heading title-text text-purple">Татуировка, <span class="text-primary">мини-тату</span></h2>
+                <p class="general-text mb-2">Татуировка — процесс нанесения перманентного (стойкого) рисунка на тело, методом местного травмирования кожного покрова с внесением в подкожную клетчатку красящего пигмента.</p>
+                <p class="general-text mb-2">Татуировка носит характерные отличительные черты, подразделяясь на виды, стили и способы изготовления. Относится к декоративным модификациям тела.</p>
+                <p class="general-text mb-0">Мини-тату - это та же самая татуировка, только небольшая. Как правило, величина такого рисунка равна размеру 5-ти рублевой монеты. Иногда чуть меньше или больше.
+                    Также пользуются популярностью несколько крошечных изображений, объединённых общей тематикой.</p>
+
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#feedbackModal" data-bs-whatever="TATOO">
+                    Записаться на услугу
+                </button>
+            </div>
+            <div class="col-md-5 order-md-1">
+{{/*                <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" fill="#aaa" dy=".3em">500x500</text></svg>*/}}
+                <img src="/static/img/service-tatoo.jpg" width="100%" height="100%" alt="...">
+            </div>
+        </div>
+
+        <hr class="featurette-divider" id="gallery">
+
+        <!-- /END THE FEATURETTES -->
+
+        <!-- GALLERY
+        ================================================== -->
+
+        <div class="pricing-header px-3 py-3 pt-md-0 pb-md-4 mx-auto text-center">
+            <h1 class="text-muted">Галерея</h1>
+        </div>
+
+        <div class="row text-center text-lg-left">
+            <div id="lightgallery">
+                {{range .Gallery}}
+                    <a href="static/img/gallery/{{.}}">
+                        <img src="static/img/gallery/{{.}}" alt="..." style="width: 127px; height: 127px;">
+                    </a>
+                {{end}}
+            </div>
+        </div>
+
+        <hr class="featurette-divider" id="prices">
+
+        <!-- /END THE GALLERY -->
+
+        <!-- PRICING
+        ================================================== -->
+
+        <div class="pricing-header px-3 py-3 pt-md-0 pb-md-4 mx-auto text-center">
+            <h1 class="text-muted">Прайс-лист</h1>
+        </div>
+
+        <table class="table table-striped">
+            <thead class="text-purple">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Наименование услуг</th>
+                <th scope="col">Стоимость</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range $index, $element := .Services}}
+                <tr>
+                    <th scope="row">{{.Id}}</th>
+                    <td>{{.Name}}</td>
+                    <td>{{.Price}}</td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-center">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-lg btn-primary my-3" data-bs-toggle="modal" data-bs-target="#feedbackModal" data-bs-whatever="PRICE">
+                Записаться на услугу
+            </button>
+        </div>
+
+        <!-- /END THE PRICING -->
+{{end}}
+
+{{define "script"}}
+<script>
+    lightGallery(document.getElementById('lightgallery'));
+</script>
+{{end}}
