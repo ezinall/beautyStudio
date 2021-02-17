@@ -64,7 +64,7 @@ func check(e error) {
 func sendEmail(conf *Conf, order *Order) {
 	auth := smtp.PlainAuth("", conf.Email.User, conf.Email.Password, conf.Email.Host)
 
-	to := []string{conf.Email.Email}
+	to := []string{conf.TmplData.Email}
 	msg := []byte(fmt.Sprintf("To: %s\r\n"+
 		"Subject: %s\r\n"+
 		"Content-Type: text/plain; charset=\"utf-8\"\r\n"+
@@ -82,12 +82,19 @@ func main() {
 	AppPort := os.Getenv("APP_PORT")
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	f, err := os.OpenFile("error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.SetOutput(f)
+	}
+	defer f.Close()
 
-	f, err := ioutil.ReadFile("conf.json")
+	c, err := ioutil.ReadFile("conf.json")
 	check(err)
 
 	conf := Conf{Host: AppIp, Port: AppPort}
-	err = json.Unmarshal(f, &conf)
+	err = json.Unmarshal(c, &conf)
 	check(err)
 
 	masterTmpl, _ := template.ParseFiles("templates/base.gohtml")
@@ -149,7 +156,7 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	s := &http.Server{
-		Addr:           fmt.Sprintf("%s:%s", conf.Host, conf.Port),
+		Addr:           fmt.Sprintf("%s:%s", AppIp, AppPort),
 		Handler:        mux,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,

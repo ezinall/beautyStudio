@@ -7,7 +7,7 @@ body {
     /*padding-bottom: 3rem;*/
     color: #5a5a5a;
     font-family: 'Comfortaa', serif;
-    background-color: aliceblue;
+    background-color: snow;
 }
 
 
@@ -196,7 +196,7 @@ nav {
 }
 
 .card {
-    background-color: aliceblue;
+    background-color: snow;
 }
 
 .card-title {
