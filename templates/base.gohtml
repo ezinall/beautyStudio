@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
+    <meta name="description" content="{{.Description}}">
+    <meta name="keywords" content="{{.Keywords}}" />
     <title>Beauty Studio Liloo — {{template "title"}}</title>
 
     <!-- Bootstrap core CSS -->
@@ -41,7 +42,7 @@
         }
     </style>
 
-    <script src="https://api-maps.yandex.ru/2.1/?apikey={{.Contacts.YandexMapAPIKey}}&lang=ru_RU" type="text/javascript"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey={{.YandexMapAPIKey}}&lang=ru_RU" type="text/javascript"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.4.0/dist/js/lightgallery.js" integrity="sha256-wSfNgFUHMi869cyzYtuk7EFGbLiozwd/dfLb9pmf4Js=" crossorigin="anonymous"></script>
 

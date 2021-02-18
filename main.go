@@ -15,13 +15,17 @@ import (
 )
 
 type tmplData struct {
-	Phone           string `json:"phone"`
-	Address         string `json:"address"`
-	Email           string `json:"email"`
-	Whatsapp        string `json:"whatsapp"`
-	Instagram       string `json:"instagram"`
-	Facebook        string `json:"facebook"`
-	Tiktok          string `json:"tiktok"`
+	Contacts struct {
+		Phone     string `json:"phone"`
+		Address   string `json:"address"`
+		Email     string `json:"email"`
+		Whatsapp  string `json:"whatsapp"`
+		Instagram string `json:"instagram"`
+		Facebook  string `json:"facebook"`
+		Tiktok    string `json:"tiktok"`
+	} `json:"contacts"`
+	Description     string `json:"description"`
+	Keywords        string `json:"keywords"`
 	YandexMapAPIKey string `json:"yandex_map_api_key"`
 }
 
@@ -64,7 +68,7 @@ func check(e error) {
 func sendEmail(conf *Conf, order *Order) {
 	auth := smtp.PlainAuth("", conf.Email.User, conf.Email.Password, conf.Email.Host)
 
-	to := []string{conf.TmplData.Email}
+	to := []string{conf.TmplData.Contacts.Email}
 	msg := []byte(fmt.Sprintf("To: %s\r\n"+
 		"Subject: %s\r\n"+
 		"Content-Type: text/plain; charset=\"utf-8\"\r\n"+
@@ -111,7 +115,7 @@ func main() {
 			_ = r.ParseForm()
 
 			order := Order{r.Form["service"][0], r.Form["name"][0], r.Form["phone"][0], r.Form["email"][0]}
-			if err = validate.Struct(order); err != nil {
+			if err = validate.Struct(order); err == nil {
 				go sendEmail(&conf, &order)
 			}
 
@@ -140,7 +144,7 @@ func main() {
 		})
 
 		data := struct {
-			Contacts tmplData
+			tmplData
 			Services []Service
 			Gallery  []string
 		}{conf.TmplData, services, gallery}

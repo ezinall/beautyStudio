@@ -221,7 +221,7 @@
             </tr>
             </thead>
             <tbody>
-            {{range $index, $element := .Services}}
+            {{range .Services}}
                 <tr>
                     <th scope="row">{{.Id}}</th>
                     <td>{{.Name}}</td>
