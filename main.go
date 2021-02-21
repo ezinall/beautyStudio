@@ -15,6 +15,7 @@ import (
 )
 
 type tmplData struct {
+	Label    string `json:"label"`
 	Contacts struct {
 		Phone     string `json:"phone"`
 		Address   string `json:"address"`
@@ -26,22 +27,24 @@ type tmplData struct {
 	} `json:"contacts"`
 	Description     string `json:"description"`
 	Keywords        string `json:"keywords"`
+	YandexMetrika   int    `json:"yandex_metrika"`
 	YandexMapAPIKey string `json:"yandex_map_api_key"`
 }
 
 type Conf struct {
 	Host     string `json:"host"`
-	Port     string `json:"port"`
+	Port     int    `json:"port"`
 	CertFile string `json:"cert_file"`
 	KeyFile  string `json:"key_file"`
 
 	Email struct {
 		Host     string `json:"host"`
-		Port     string `json:"port"`
+		Port     int    `json:"port"`
 		User     string `json:"user"`
 		Password string `json:"password"`
 		Email    string `json:"email"`
 	} `json:"email"`
+	To string `json:"to"`
 
 	TmplData tmplData `json:"tmpl_data"`
 }
@@ -68,13 +71,13 @@ func check(e error) {
 func sendEmail(conf *Conf, order *Order) {
 	auth := smtp.PlainAuth("", conf.Email.User, conf.Email.Password, conf.Email.Host)
 
-	to := []string{conf.TmplData.Contacts.Email}
+	to := []string{conf.To}
 	msg := []byte(fmt.Sprintf("To: %s\r\n"+
 		"Subject: %s\r\n"+
 		"Content-Type: text/plain; charset=\"utf-8\"\r\n"+
 		"\r\n"+
-		"%s\n%s\n%s\r\n", conf.Email.Email, order.Service, order.Name, order.Phone, order.Email))
-	err := smtp.SendMail(fmt.Sprintf("%s:%s", conf.Email.Host, conf.Email.Port), auth, conf.Email.Email, to, msg)
+		"%s\n%s\n%s\r\n", conf.To, order.Service, order.Name, order.Phone, order.Email))
+	err := smtp.SendMail(fmt.Sprintf("%s:%d", conf.Email.Host, conf.Email.Port), auth, conf.Email.Email, to, msg)
 	if err != nil {
 		log.Println(err)
 	}
@@ -97,7 +100,7 @@ func main() {
 	c, err := ioutil.ReadFile("conf.json")
 	check(err)
 
-	conf := Conf{Host: AppIp, Port: AppPort}
+	conf := Conf{}
 	err = json.Unmarshal(c, &conf)
 	check(err)
 

@@ -18,3 +18,4 @@
 
 conf.json
 services.json
+*.log
