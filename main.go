@@ -1,3 +1,5 @@
+// Kisa Kisovna the web-site
+
 package main
 
 import (
@@ -14,7 +16,7 @@ import (
 	"time"
 )
 
-type tmplData struct {
+type TmplData struct {
 	Label    string `json:"label"`
 	Contacts struct {
 		Phone     string `json:"phone"`
@@ -27,15 +29,15 @@ type tmplData struct {
 	} `json:"contacts"`
 	Description     string `json:"description"`
 	Keywords        string `json:"keywords"`
-	YandexMetrika   int    `json:"yandex_metrika"`
-	YandexMapAPIKey string `json:"yandex_map_api_key"`
+	YandexMetrika   int    `json:"yandexMetrika"`
+	YandexMapAPIKey string `json:"yandexMapAPIKey"`
 }
 
 type Conf struct {
 	Host     string `json:"host"`
 	Port     int    `json:"port"`
-	CertFile string `json:"cert_file"`
-	KeyFile  string `json:"key_file"`
+	CertFile string `json:"certFile"`
+	KeyFile  string `json:"keyFile"`
 
 	Email struct {
 		Host     string `json:"host"`
@@ -46,8 +48,10 @@ type Conf struct {
 	} `json:"email"`
 	To string `json:"to"`
 
-	TmplData tmplData `json:"tmpl_data"`
+	TmplData TmplData `json:"tmplData"`
 }
+
+var conf Conf
 
 type Service struct {
 	Id    int    `json:"id"`
@@ -55,12 +59,14 @@ type Service struct {
 	Price string `json:"price"`
 }
 
-type Order struct {
+type Appointment struct {
 	Service string `validate:"required"`
 	Name    string `validate:"required"`
 	Phone   string
 	Email   string `validate:"required,email"`
 }
+
+var validate *validator.Validate
 
 func check(e error) {
 	if e != nil {
@@ -68,7 +74,7 @@ func check(e error) {
 	}
 }
 
-func sendEmail(conf *Conf, order *Order) {
+func sendEmail(conf *Conf, order *Appointment) {
 	auth := smtp.PlainAuth("", conf.Email.User, conf.Email.Password, conf.Email.Host)
 
 	to := []string{conf.To}
@@ -83,10 +89,58 @@ func sendEmail(conf *Conf, order *Order) {
 	}
 }
 
+func appointmentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+
+	_ = r.ParseForm()
+
+	order := Appointment{r.Form["service"][0], r.Form["name"][0], r.Form["phone"][0], r.Form["email"][0]}
+	if err := validate.Struct(order); err == nil {
+		go sendEmail(&conf, &order)
+	}
+
+	w.Header().Set("Location", "/")
+	w.WriteHeader(http.StatusSeeOther) // Django return http.StatusFound
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("templates/index.gohtml")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	s, _ := ioutil.ReadFile("services.json")
+	var services []Service
+	_ = json.Unmarshal(s, &services)
+
+	var gallery []string
+	err = filepath.Walk("./static/img/gallery", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() || filepath.Ext(path) != ".jpg" {
+			return nil
+		}
+		gallery = append(gallery, info.Name())
+		return nil
+	})
+
+	data := struct {
+		TmplData
+		Services []Service
+		Gallery  []string
+	}{conf.TmplData, services, gallery}
+
+	err = tmpl.ExecuteTemplate(w, "layout", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func main() {
-	// Hello Kisa Kisovna, the web server
-	AppIp := os.Getenv("APP_IP")
-	AppPort := os.Getenv("APP_PORT")
+	//AppIp := os.Getenv("APP_IP")
+	//AppPort := os.Getenv("APP_PORT")
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	f, err := os.OpenFile("error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
@@ -97,77 +151,29 @@ func main() {
 	}
 	defer f.Close()
 
+	// Parse config ==================================================
 	c, err := ioutil.ReadFile("conf.json")
 	check(err)
 
-	conf := Conf{}
 	err = json.Unmarshal(c, &conf)
 	check(err)
 
-	masterTmpl, _ := template.ParseFiles("templates/base.gohtml")
+	// Set validator ==================================================
+	validate = validator.New()
 
-	validate := validator.New()
-
-	indexHandler := func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-			return
-		}
-
-		if r.Method == http.MethodPost {
-			_ = r.ParseForm()
-
-			order := Order{r.Form["service"][0], r.Form["name"][0], r.Form["phone"][0], r.Form["email"][0]}
-			if err = validate.Struct(order); err == nil {
-				go sendEmail(&conf, &order)
-			}
-
-			w.Header().Set("Location", "/")
-			w.WriteHeader(http.StatusSeeOther) // Django return http.StatusFound
-			return
-		}
-
-		tmpl, err := template.Must(masterTmpl.Clone()).ParseFiles("templates/index.gohtml")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		s, _ := ioutil.ReadFile("services.json")
-		var services []Service
-		_ = json.Unmarshal(s, &services)
-
-		var gallery []string
-		err = filepath.Walk("./static/img/gallery", func(path string, info os.FileInfo, err error) error {
-			if info.IsDir() || filepath.Ext(path) != ".jpg" {
-				return nil
-			}
-			gallery = append(gallery, info.Name())
-			return nil
-		})
-
-		data := struct {
-			tmplData
-			Services []Service
-			Gallery  []string
-		}{conf.TmplData, services, gallery}
-
-		err = tmpl.ExecuteTemplate(w, "layout", data)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-
+	// Create server ==================================================
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", indexHandler)
+	mux.HandleFunc("/appointment/", appointmentHandler)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	s := &http.Server{
-		Addr:           fmt.Sprintf("%s:%s", AppIp, AppPort),
+		//Addr:           fmt.Sprintf("%s:%s", AppIp, AppPort),
+		Addr:           fmt.Sprintf("%s:%d", conf.Host, conf.Port),
 		Handler:        mux,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
+		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
 	log.Fatal(s.ListenAndServe())
 }

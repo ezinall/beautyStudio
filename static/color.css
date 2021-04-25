@@ -1,0 +1,62 @@
+/* Color Theme Swatches in Hex */
+.JORDAN-MAX-200-1-hex {
+    color: #727273;
+}
+
+.JORDAN-MAX-200-2-hex {
+    color: #400101;
+}
+
+.JORDAN-MAX-200-3-hex {
+    color: #a62121;
+}
+
+.JORDAN-MAX-200-4-hex {
+    color: #BFBFBF;
+}
+
+.JORDAN-MAX-200-5-hex {
+    color: #0D0D0D;
+}
+
+/* Color Theme Swatches in RGBA */
+.JORDAN-MAX-200-1-rgba {
+    color: rgba(113, 113, 114, 1);
+}
+
+.JORDAN-MAX-200-2-rgba {
+    color: rgba(63, 1, 1, 1);
+}
+
+.JORDAN-MAX-200-3-rgba {
+    color: rgba(165, 33, 33, 1);
+}
+
+.JORDAN-MAX-200-4-rgba {
+    color: rgba(191, 191, 191, 1);
+}
+
+.JORDAN-MAX-200-5-rgba {
+    color: rgba(12, 12, 12, 1);
+}
+
+/* Color Theme Swatches in HSLA */
+.JORDAN-MAX-200-1-hsla {
+    color: hsla(236, 0, 44, 1);
+}
+
+.JORDAN-MAX-200-2-hsla {
+    color: hsla(0, 96, 12, 1);
+}
+
+.JORDAN-MAX-200-3-hsla {
+    color: hsla(0, 66, 39, 1);
+}
+
+.JORDAN-MAX-200-4-hsla {
+    color: hsla(0, 0, 75, 1);
+}
+
+.JORDAN-MAX-200-5-hsla {
+    color: hsla(0, 0, 5, 1);
+}
