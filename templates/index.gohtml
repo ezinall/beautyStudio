@@ -275,7 +275,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/" method="POST" id="appointmentForm" class="row g-3">
+                <form action="/appointment/" method="POST" id="appointmentForm" class="row g-3">
+                    <input type="hidden" name="token" value="{{.Token}}" required>
                     <div class="col-md-6">
                         <label for="inputName" class="form-label">Имя*</label>
                         <input type="text" name="name" class="form-control" id="inputName" required>
@@ -284,10 +285,10 @@
                         <label for="inputPhone" class="form-label">Телефон*</label>
                         <input type="tel" name="phone" class="form-control" id="inputPhone" required>
                     </div>
-                    <div class="col-md-12 mt-3">
-                        <label for="inputEmail" class="form-label">E-mail</label>
-                        <input type="email" name="email" class="form-control" id="inputEmail">
-                    </div>
+{{/*                    <div class="col-md-12 mt-3">*/}}
+{{/*                        <label for="inputEmail" class="form-label">E-mail</label>*/}}
+{{/*                        <input type="email" name="email" class="form-control" id="inputEmail">*/}}
+{{/*                    </div>*/}}
                     <input type="hidden" name="service" id="inputService" hidden>
                 </form>
             </div>

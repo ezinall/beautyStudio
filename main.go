@@ -5,6 +5,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"golang.org/x/net/xsrftoken"
 	"gopkg.in/go-playground/validator.v10"
 	"html/template"
 	"io/ioutil"
@@ -34,10 +35,11 @@ type TmplData struct {
 }
 
 type Conf struct {
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	CertFile string `json:"certFile"`
-	KeyFile  string `json:"keyFile"`
+	SecretKey string `json:"secretKey"`
+	Host      string `json:"host"`
+	Port      int    `json:"port"`
+	CertFile  string `json:"certFile"`
+	KeyFile   string `json:"keyFile"`
 
 	Email struct {
 		Host     string `json:"host"`
@@ -62,8 +64,8 @@ type Service struct {
 type Appointment struct {
 	Service string `validate:"required"`
 	Name    string `validate:"required"`
-	Phone   string
-	Email   string `validate:"required,email"`
+	Phone   string `validate:"required"`
+	Email   string `validate:"email"`
 }
 
 var validate *validator.Validate
@@ -95,11 +97,16 @@ func appointmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = r.ParseForm()
-
-	order := Appointment{r.Form["service"][0], r.Form["name"][0], r.Form["phone"][0], r.Form["email"][0]}
-	if err := validate.Struct(order); err == nil {
-		go sendEmail(&conf, &order)
+	if xsrftoken.ValidFor(r.FormValue("token"), conf.SecretKey, "", "", xsrftoken.Timeout) {
+		appointment := Appointment{
+			r.FormValue("service"),
+			r.FormValue("name"),
+			r.FormValue("phone"),
+			r.FormValue("email"),
+		}
+		if err := validate.Struct(appointment); err == nil {
+			go sendEmail(&conf, &appointment)
+		}
 	}
 
 	w.Header().Set("Location", "/")
@@ -126,11 +133,14 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 
+	token := xsrftoken.Generate(conf.SecretKey, "", "")
+
 	data := struct {
 		TmplData
 		Services []Service
 		Gallery  []string
-	}{conf.TmplData, services, gallery}
+		Token    string
+	}{conf.TmplData, services, gallery, token}
 
 	err = tmpl.ExecuteTemplate(w, "layout", data)
 	if err != nil {
