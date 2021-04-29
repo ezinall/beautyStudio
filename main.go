@@ -1,8 +1,9 @@
-// Kisa Kisovna the web-site
+// Kisa Kisovna the Web-site
 
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"golang.org/x/net/xsrftoken"
@@ -13,7 +14,9 @@ import (
 	"net/http"
 	"net/smtp"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 	"time"
 )
 
@@ -110,7 +113,7 @@ func appointmentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Location", "/")
-	w.WriteHeader(http.StatusSeeOther) // Django return http.StatusFound
+	w.WriteHeader(http.StatusFound) // Django return http.StatusFound
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -149,9 +152,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	//AppIp := os.Getenv("APP_IP")
-	//AppPort := os.Getenv("APP_PORT")
-
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	f, err := os.OpenFile("error.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
 	if err != nil {
@@ -161,7 +161,7 @@ func main() {
 	}
 	defer f.Close()
 
-	// Parse config ==================================================
+	// Parse config ===================================================
 	c, err := ioutil.ReadFile("conf.json")
 	check(err)
 
@@ -178,12 +178,27 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	s := &http.Server{
-		//Addr:           fmt.Sprintf("%s:%s", AppIp, AppPort),
+		//Addr:           fmt.Sprintf("%s:%s", os.Getenv("APP_IP"), os.Getenv("APP_PORT")),
 		Addr:           fmt.Sprintf("%s:%d", conf.Host, conf.Port),
 		Handler:        mux,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
-	log.Fatal(s.ListenAndServe())
+
+	go func() {
+		log.Fatal(s.ListenAndServe())
+	}()
+
+	// Graceful shutdown ==============================================
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	<-ch
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err = s.Shutdown(ctx); err != nil {
+		log.Println(err)
+	}
 }
