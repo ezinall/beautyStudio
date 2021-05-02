@@ -20,6 +20,28 @@ import (
 	"time"
 )
 
+// Conf contains total config for server
+type Conf struct {
+	SecretKey string `json:"secretKey"`
+	Host      string `json:"host"`
+	Port      int    `json:"port"`
+	CertFile  string `json:"certFile"`
+	KeyFile   string `json:"keyFile"`
+
+	// Email setting for appointment request
+	Email struct {
+		Host     string `json:"host"`
+		Port     int    `json:"port"`
+		User     string `json:"user"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	} `json:"email"`
+	To string `json:"to"`
+
+	TmplData TmplData `json:"tmplData"`
+}
+
+// TmplData for template content
 type TmplData struct {
 	Label    string `json:"label"`
 	Contacts struct {
@@ -37,39 +59,21 @@ type TmplData struct {
 	YandexMapAPIKey string `json:"yandexMapAPIKey"`
 }
 
-type Conf struct {
-	SecretKey string `json:"secretKey"`
-	Host      string `json:"host"`
-	Port      int    `json:"port"`
-	CertFile  string `json:"certFile"`
-	KeyFile   string `json:"keyFile"`
-
-	Email struct {
-		Host     string `json:"host"`
-		Port     int    `json:"port"`
-		User     string `json:"user"`
-		Password string `json:"password"`
-		Email    string `json:"email"`
-	} `json:"email"`
-	To string `json:"to"`
-
-	TmplData TmplData `json:"tmplData"`
-}
-
-var conf Conf
-
 type Service struct {
 	Id    int    `json:"id"`
 	Name  string `json:"name"`
 	Price string `json:"price"`
 }
 
+// Appointment form
 type Appointment struct {
 	Service string `validate:"required"`
 	Name    string `validate:"required"`
 	Phone   string `validate:"required"`
 	Email   string `validate:"email"`
 }
+
+var conf Conf
 
 var validate *validator.Validate
 
@@ -79,15 +83,16 @@ func check(e error) {
 	}
 }
 
-func sendEmail(conf *Conf, order *Appointment) {
+func sendEmail(ap Appointment) {
 	auth := smtp.PlainAuth("", conf.Email.User, conf.Email.Password, conf.Email.Host)
 
 	to := []string{conf.To}
-	msg := []byte(fmt.Sprintf("To: %s\r\n"+
+	msg := []byte(fmt.Sprintf("From: %s %s\r\n"+
+		"To: %s\r\n"+
 		"Subject: %s\r\n"+
 		"Content-Type: text/plain; charset=\"utf-8\"\r\n"+
 		"\r\n"+
-		"%s\n%s\n%s\r\n", conf.To, order.Service, order.Name, order.Phone, order.Email))
+		"%s\n%s\n%s\r\n", conf.TmplData.Label, conf.Email.Email, conf.To, ap.Service, ap.Name, ap.Phone, ap.Email))
 	err := smtp.SendMail(fmt.Sprintf("%s:%d", conf.Email.Host, conf.Email.Port), auth, conf.Email.Email, to, msg)
 	if err != nil {
 		log.Println(err)
@@ -100,15 +105,15 @@ func appointmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if xsrftoken.ValidFor(r.FormValue("token"), conf.SecretKey, "", "", xsrftoken.Timeout) {
+	if xsrftoken.ValidFor(r.PostFormValue("token"), conf.SecretKey, "", "", xsrftoken.Timeout) {
 		appointment := Appointment{
-			r.FormValue("service"),
-			r.FormValue("name"),
-			r.FormValue("phone"),
-			r.FormValue("email"),
+			r.PostFormValue("service"),
+			r.PostFormValue("name"),
+			r.PostFormValue("phone"),
+			r.PostFormValue("email"),
 		}
 		if err := validate.Struct(appointment); err == nil {
-			go sendEmail(&conf, &appointment)
+			go sendEmail(appointment)
 		}
 	}
 
