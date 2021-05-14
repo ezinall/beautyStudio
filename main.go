@@ -6,8 +6,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"golang.org/x/net/xsrftoken"
-	"gopkg.in/go-playground/validator.v10"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -70,7 +70,7 @@ type Appointment struct {
 	Service string `validate:"required"`
 	Name    string `validate:"required"`
 	Phone   string `validate:"required"`
-	Email   string `validate:"email"`
+	//Email   string `validate:"email"`
 }
 
 var conf Conf
@@ -92,36 +92,32 @@ func sendEmail(ap Appointment) {
 		"Subject: %s\r\n"+
 		"Content-Type: text/plain; charset=\"utf-8\"\r\n"+
 		"\r\n"+
-		"%s\n%s\n%s\r\n", conf.TmplData.Label, conf.Email.Email, conf.To, ap.Service, ap.Name, ap.Phone, ap.Email))
+		"%s\n%s\r\n", conf.TmplData.Label, conf.Email.Email, conf.To, ap.Service, ap.Name, ap.Phone))
 	err := smtp.SendMail(fmt.Sprintf("%s:%d", conf.Email.Host, conf.Email.Port), auth, conf.Email.Email, to, msg)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-func appointmentHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-
-	if xsrftoken.ValidFor(r.PostFormValue("token"), conf.SecretKey, "", "", xsrftoken.Timeout) {
-		appointment := Appointment{
-			r.PostFormValue("service"),
-			r.PostFormValue("name"),
-			r.PostFormValue("phone"),
-			r.PostFormValue("email"),
-		}
-		if err := validate.Struct(appointment); err == nil {
-			go sendEmail(appointment)
-		}
-	}
-
-	w.Header().Set("Location", "/")
-	w.WriteHeader(http.StatusFound) // Django return http.StatusFound
-}
-
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		if xsrftoken.ValidFor(r.PostFormValue("token"), conf.SecretKey, "", "", xsrftoken.Timeout) {
+			appointment := Appointment{
+				r.PostFormValue("service"),
+				r.PostFormValue("name"),
+				r.PostFormValue("phone"),
+				//r.PostFormValue("email"),
+			}
+			if err := validate.Struct(appointment); err == nil {
+				go sendEmail(appointment)
+
+				w.Header().Set("Location", "/")
+				w.WriteHeader(http.StatusFound) // Django return http.StatusFound
+				return
+			}
+		}
+	}
+
 	tmpl, err := template.ParseFiles("templates/index.gohtml")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -179,7 +175,6 @@ func main() {
 	// Create server ==================================================
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", indexHandler)
-	mux.HandleFunc("/appointment/", appointmentHandler)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	s := &http.Server{
